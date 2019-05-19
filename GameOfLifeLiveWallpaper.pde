@@ -1,27 +1,39 @@
 final int CELL_SIZE = 16;
 final int FADE_RATE = 36;
+final float DENSITY = 0.36;
 
 int sx, sy;
-float density = 0.36;
 int[][][] world;
 int[][] alpha_map;
-
+color[][] color_map;
 
 void setup()
 {
+  // Display
   size(displayWidth, displayHeight, P2D);
   frameRate(30);
+  
+  // Grid
   sx = (int)displayWidth/CELL_SIZE;
   sy = (int)displayHeight/CELL_SIZE;
+  
+  // Grid backend
   world = new int[sx][sy][2];
-  alpha_map = new color[sx][sy];
+  alpha_map = new int[sx][sy];
+  color_map = new color[sx][sy];
 
   // Set random cells to 'on'
-  for (int i = 0; i < sx * sy * density; i++) {
+  for (int i = 0; i < sx * sy * DENSITY; i++) {
     int x = (int)random(sx);
     int y = (int)random(sy);
     world[x][y][1] = 1;
     alpha_map[x][y] = 255;
+  }
+  
+  for(int i = 0; i < sx; i++) {
+    for(int j = 0; j < sy; j++) {
+      color_map[i][j] = color(255*((float)i/sx), 255*((float)j/sy), 255*((float)(i+j)/sqrt(sx^2 +sy^2))); 
+    }
   }
 }
 
@@ -32,13 +44,15 @@ void draw()
   // Drawing and update cycle
   for (int x = 0; x < sx; x=x+1) {
     for (int y = 0; y < sy; y=y+1) {
+      color_map[x][y] = color((((float)x/sx)) * 255, ((float)y/sy) * 255, ((float)sqrt(x^2+y^2)/sqrt(sx^2 +sy^2)) * 255); 
+      
       // if living or going to live draw square
       if ((world[x][y][1] == 1) || (world[x][y][1] == 0 && world[x][y][0] == 1))
       {
         world[x][y][0] = 1;
         alpha_map[x][y] = 255;
       }
-      // if dying die
+      // if dying fade-out
       if (world[x][y][1] == -1)
       {
         world[x][y][0] = 0;
@@ -48,7 +62,7 @@ void draw()
       alpha_map[x][y] -= FADE_RATE;
       
       if (alpha_map[x][y] > 0) {
-        fill(#FFFFFF, alpha_map[x][y]);
+        fill(color_map[x][y], alpha_map[x][y]);
         rectMode(CORNER);
         rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
