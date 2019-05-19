@@ -47,9 +47,11 @@ void draw()
       world[x][y][1] = 0;
       alpha_map[x][y] -= FADE_RATE;
       
-      fill(#FFFFFF, alpha_map[x][y]);
-      rectMode(CORNER);
-      rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      if (alpha_map[x][y] > 0) {
+        fill(#FFFFFF, alpha_map[x][y]);
+        rectMode(CORNER);
+        rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
+      }
     }
   }
   // Birth and death cycle
