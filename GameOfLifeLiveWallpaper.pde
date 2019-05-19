@@ -1,25 +1,8 @@
-/*
- * [CalsignLabs]
- * This example taken from the Processing distribution.
- */
-
-/**
- * Conway's Game of Life
- * by Mike Davis.
- * 
- * This program is a simple version of Conway's 
- * game of Life.  A lit point turns off if there 
- * are fewer than two or more than three surrounding 
- * lit points.  An unlit point turns on if there 
- * are exactly three lit neighbors.  The 'density' 
- * parameter determines how much of the board will 
- * start out lit.
- */
 final int CELL_SIZE = 16;
-final int FADE_RATE = 5;
+final int FADE_RATE = 36;
 
 int sx, sy;
-float density = 0.5;
+float density = 0.36;
 int[][][] world;
 int[][] alpha_map;
 
@@ -87,6 +70,10 @@ void draw()
 
 // Bring the current cell to life
 void touchMoved() {
+  world[min(sx-1, max(mouseX/CELL_SIZE, 0))][min(sy-1, max(mouseY/CELL_SIZE, 0))][1] = 1;
+}
+
+void mouseDragged() {
   world[min(sx-1, max(mouseX/CELL_SIZE, 0))][min(sy-1, max(mouseY/CELL_SIZE, 0))][1] = 1;
 }
 
