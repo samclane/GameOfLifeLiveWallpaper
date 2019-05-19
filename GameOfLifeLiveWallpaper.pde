@@ -15,23 +15,30 @@
  * parameter determines how much of the board will 
  * start out lit.
  */
+final int CELL_SIZE = 16;
+final int FADE_RATE = 5;
 
 int sx, sy;
 float density = 0.5;
 int[][][] world;
-int cell_size = 16;
+int[][] alpha_map;
+
 
 void setup()
 {
   size(displayWidth, displayHeight, P2D);
   frameRate(30);
-  sx = (int)displayWidth/cell_size;
-  sy = (int)displayHeight/cell_size;
+  sx = (int)displayWidth/CELL_SIZE;
+  sy = (int)displayHeight/CELL_SIZE;
   world = new int[sx][sy][2];
+  alpha_map = new color[sx][sy];
 
   // Set random cells to 'on'
   for (int i = 0; i < sx * sy * density; i++) {
-    world[(int)random(sx)][(int)random(sy)][1] = 1;
+    int x = (int)random(sx);
+    int y = (int)random(sy);
+    world[x][y][1] = 1;
+    alpha_map[x][y] = 255;
   }
 }
 
@@ -42,20 +49,24 @@ void draw()
   // Drawing and update cycle
   for (int x = 0; x < sx; x=x+1) {
     for (int y = 0; y < sy; y=y+1) {
-      //if (world[x][y][1] == 1)
-      // Change recommended by The.Lucky.Mutt
+      // if living or going to live draw square
       if ((world[x][y][1] == 1) || (world[x][y][1] == 0 && world[x][y][0] == 1))
       {
         world[x][y][0] = 1;
-        //set(x, y, #FFFFFF);
-        rectMode(CORNER);
-        rect(x*cell_size, y*cell_size, cell_size, cell_size);
+        alpha_map[x][y] = 255;
       }
+      // if dying die
       if (world[x][y][1] == -1)
       {
         world[x][y][0] = 0;
+        alpha_map[x][y] -= FADE_RATE;
       }
       world[x][y][1] = 0;
+      alpha_map[x][y] -= FADE_RATE;
+      
+      fill(#FFFFFF, alpha_map[x][y]);
+      rectMode(CORNER);
+      rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
     }
   }
   // Birth and death cycle
@@ -76,7 +87,7 @@ void draw()
 
 // Bring the current cell to life
 void touchMoved() {
-  world[min(sx-1, max(mouseX/cell_size, 0))][min(sy-1, max(mouseY/cell_size, 0))][1] = 1;
+  world[min(sx-1, max(mouseX/CELL_SIZE, 0))][min(sy-1, max(mouseY/CELL_SIZE, 0))][1] = 1;
 }
 
 // Count the number of adjacent cells 'on'
