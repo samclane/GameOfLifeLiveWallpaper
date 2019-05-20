@@ -1,5 +1,6 @@
 final int CELL_SIZE = 16;
 final int FADE_RATE = 36;
+final float COLOR_SPEED = 0.0001;
 final float DENSITY = 0.1;
 
 int sx, sy;
@@ -29,12 +30,13 @@ void setup() {
     alpha_map[x][y] = 255;
   }
 
+  colorMode(HSB, 255);
   for (int i = 0; i < sx; i++) {
     for (int j = 0; j < sy; j++) {
-      color_map[i][j] = color(255*((float)i/sx), 255*((float)j/sy), 255*((float)(i+j)/sqrt(sx^2 +sy^2)));
+      color(127*(sin(frameCount*COLOR_SPEED)*(float)i/sx)+127*(cos(frameCount*COLOR_SPEED)*(float)j/sy) + 127, 255, 255);
     }
   }
-  
+   
 }
 
 void draw() {
@@ -43,9 +45,8 @@ void draw() {
   // Drawing and update cycle
   for (int x = 0; x < sx; x=x+1) {
     for (int y = 0; y < sy; y=y+1) {
-      //float frame = .60 * frameCount;
-      //color_map[x][y] = color(255*sin(frame+x), 255*cos(frame+y), 255*sin(frame));
-
+      color_map[x][y] = color(127*(sin(frameCount*.05)*(float)x/sx)+127*(cos(frameCount*.05)*(float)y/sy) + 127, 255, 255);
+      
       // if living or going to live draw square
       if ((world[x][y][1] == 1) || (world[x][y][1] == 0 && world[x][y][0] == 1)) {
         world[x][y][0] = 1;
