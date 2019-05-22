@@ -1,6 +1,6 @@
 final int CELL_SIZE = 16;
 final int FADE_RATE = 36;
-final float COLOR_SPEED = 0.0001;
+final float COLOR_SPEED = 0.01;
 final float DENSITY = 0.1;
 
 int sx, sy;
@@ -41,7 +41,7 @@ void draw() {
   // Drawing and update cycle
   for (int x = 0; x < sx; x=x+1) {
     for (int y = 0; y < sy; y=y+1) {
-      color_map[x][y] = color(127*(sin(frameCount*.05)*(float)x/sx)+127*(cos(frameCount*.05)*(float)y/sy) + 127, 255, 255);
+      color_map[x][y] = color(127*(sin(frameCount*COLOR_SPEED)*(float)x/sx)+127*(cos(frameCount*COLOR_SPEED)*(float)y/sy) + 127, 255, 255);
 
       // if living or going to live draw square
       if ((world[x][y][1] == 1) || (world[x][y][1] == 0 && world[x][y][0] == 1)) {
@@ -78,7 +78,7 @@ void draw() {
 }
 
 void setCell(int x, int y) {
-  world[min(sx-1, max(x/CELL_SIZE, 0))][min(sy-1, max(y/CELL_SIZE, 0))][1] = 1;
+  world[constrain(x/CELL_SIZE, 0, sx-1)][constrain(y/CELL_SIZE, 0, sy-1)][1] = 1; 
 }
 
 // Bring the current cell to life
