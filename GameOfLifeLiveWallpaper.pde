@@ -1,34 +1,33 @@
 final int CELL_SIZE = 16;
 final int FADE_RATE = 36;
-final float COLOR_SPEED = 0.01;
-final float DENSITY = 0.1;
+final float COLOR_SPEED = 0.07;
+final float DENSITY = 0.25;
 
 int sx, sy;
 int[][][] world;
-int[][] alpha_map;
-color[][] color_map;
+int[][] alphaMap;
 
 void setup() {
   // Display
-  size(displayWidth, displayHeight, P2D);
+  fullScreen();
+  // size(displayWidth, displayHeight, P2D);
   frameRate(30);
   orientation(PORTRAIT);
 
   // Grid
-  sx = (int)displayWidth/CELL_SIZE;
-  sy = (int)displayHeight/CELL_SIZE;
+  sx = int(displayWidth/CELL_SIZE);
+  sy = int(displayHeight/CELL_SIZE);
 
   // Grid backend
   world = new int[sx][sy][2];
-  alpha_map = new int[sx][sy];
-  color_map = new color[sx][sy];
-
+  alphaMap = new int[sx][sy];
+  
   // Set random cells to 'on'
   for (int i = 0; i < sx * sy * DENSITY; i++) {
     int x = (int)random(sx);
     int y = (int)random(sy);
     world[x][y][1] = 1;
-    alpha_map[x][y] = 255;
+    alphaMap[x][y] = 255;
   }
 
   // Initialize color-changing gradient
@@ -37,27 +36,27 @@ void setup() {
 
 void draw() {
   background(0);
-
+  
   // Drawing and update cycle
   for (int x = 0; x < sx; x=x+1) {
     for (int y = 0; y < sy; y=y+1) {
-      color_map[x][y] = color(127*(sin(frameCount*COLOR_SPEED)*(float)x/sx)+127*(cos(frameCount*COLOR_SPEED)*(float)y/sy) + 127, 255, 255);
+      color hue = getColorTexture(x,y);
 
       // if living or going to live draw square
       if ((world[x][y][1] == 1) || (world[x][y][1] == 0 && world[x][y][0] == 1)) {
         world[x][y][0] = 1;
-        alpha_map[x][y] = 255;
+        alphaMap[x][y] = 255;
       }
       // if dying fade-out
       if (world[x][y][1] == -1) {
         world[x][y][0] = 0;
-        alpha_map[x][y] -= FADE_RATE;
+        alphaMap[x][y] -= FADE_RATE;
       }
       world[x][y][1] = 0;
-      alpha_map[x][y] -= FADE_RATE;
+      alphaMap[x][y] -= FADE_RATE;
 
-      if (alpha_map[x][y] > 0) {
-        fill(color_map[x][y], alpha_map[x][y]);
+      if (alphaMap[x][y] > 0) {
+        fill(hue, alphaMap[x][y]);
         rectMode(CORNER);
         rect(x*CELL_SIZE, y*CELL_SIZE, CELL_SIZE, CELL_SIZE);
       }
@@ -77,8 +76,12 @@ void draw() {
   }
 }
 
+color getColorTexture(int x, int y) {
+  return color(127*(sin(frameCount*COLOR_SPEED)*(float)x/sx) + 127*(cos(frameCount*COLOR_SPEED)*(float)y/sy) + 127, 255, 255);
+}
+
 void setCell(int x, int y) {
-  world[constrain(x/CELL_SIZE, 0, sx-1)][constrain(y/CELL_SIZE, 0, sy-1)][1] = 1; 
+  world[(x/CELL_SIZE + 1) % sx][(y/CELL_SIZE + 1) % sy][1] = 1;
 }
 
 // Bring the current cell to life
